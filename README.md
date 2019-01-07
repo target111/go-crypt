@@ -9,19 +9,19 @@
 
 ## How it works
 Blah, blah, you don't care about the details.. You only want to ransom some poor fuck so here's what you need to do:
-1. go run gen_rsa.go
+1. `go run gen_rsa.go`
     1. copy values
-    2. modify decrypt-key.go, crypter/encrypt.go and server/server.go with those values (there are comments that tell you where those things should go)
-2. modify crypter/*crypt.go with servers ip address (or domain if you're a cool kid)
-3. modify crypter/encrypt.go with your email
-4. modify server/config.json according to your needs
+    2. modify `decrypt-key.go`, `crypter/encrypt.go` and `server/server.go` with those values (there are comments that tell you where those things should go)
+2. modify `crypter/*crypt.go` with servers ip address (or domain if you're a cool kid)
+3. modify `crypter/encrypt.go` with your email
+4. modify `server/config.json` according to your needs
 5. compile the damn bins
-    * for windows: GOOS=windows GOARCH=386 go build -ldflags="-s -w" <file>.go
-    * for linux: GOOS=linux GOARCH=386 go build -ldflags="-s -w" <file>.go
+    * for windows: `GOOS=windows GOARCH=386 go build -ldflags="-s -w" <file>.go`
+    * for linux: `GOOS=linux GOARCH=386 go build -ldflags="-s -w" <file>.go`
 6. if they're to big, compress them
-    * upx --brute <file>
+    * `upx --brute <file>`
 7. spin up the server
-    * go run server.go
+    * `go run server.go`
 8. enjoy!
 
 ## Q&A
