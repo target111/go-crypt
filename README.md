@@ -38,7 +38,7 @@ _It just doesn't work!_
 Try without compression.
 
 _I did, still doesn't work!_
-In case you're on linux you need to generate with `dbus-uuidgen` and put it in `/etc/machine-id`.
+In case you're on linux you need to generate with a machine ID with `dbus-uuidgen` and put it in `/etc/machine-id`.
 
 ## License
 `Go-crypt` is made with ♥  by target_ and is licensed under WTFPL - Do What the Fuck You Want to Public License, which is pretty clear on what you can and what you can't do:
