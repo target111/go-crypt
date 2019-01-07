@@ -27,12 +27,16 @@ Blah, blah, you don't care about the details.. You only want to ransom some poor
 ## Q&A
 _Can I do a test run?_
 Yes, if you're on UNIX specify the `HOME` variable before the script.
+
 _B-but what if my tawget doesn't have intewnet?_
 No problem, a key.txt file will be created in the exectuion dir. Ask them to give you the file then decrypt it with `decrypt_key.go` and put the key into `decrypt-offline.go` then you just compile it like you did with the other bins.
+
 _Ok, fine, how do I get my money after a successfull ransom?_
 Simply sweep the private addresses from the `server/log.txt` file. Do I also need to teach you how to grep?
+
 _It just doesn't work!_
 Try without compression.
+
 _I did, still doesn't work!_
 In case you're on linux you need to generate with `dbus-uuidgen` and put it in `/etc/machine-id`.
 
