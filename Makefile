@@ -6,7 +6,7 @@ GOCLEAN=$(GOCMD) clean
 
 # Build environment
 BUILD_DIR=bins
-BUILD_OPTIONS='-ldflags="-s -w"'
+BUILD_OPTIONS=-ldflags="-s -w"
 SRC_DIR=crypter
 ARCH=386
 
