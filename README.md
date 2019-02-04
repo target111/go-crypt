@@ -8,7 +8,7 @@
 * Convenience - Automatic bitcoin transactions. Unlocks at 6+ confirmations.
 
 ## How it works
-Blah, blah, you don't care about the details.. You only want to get this thing running here's what you need to do:
+Blah, blah, you don't care about the details... You only want to get this thing running so here's what you need to do:
 1. `go run gen_rsa.go`
     1. copy values
     2. modify `decrypt-key.go`, `crypter/encrypt.go` and `server.go` with those values (there are comments that tell you where those things should go)
