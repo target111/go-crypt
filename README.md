@@ -8,7 +8,7 @@
 * Convenience - Automatic bitcoin transactions. Unlocks at 6+ confirmations.
 
 ## How it works
-Blah, blah, you don't care about the details.. You only want to ransom some poor fuck so here's what you need to do:
+Blah, blah, you don't care about the details.. You only want to get this thing running here's what you need to do:
 1. `go run gen_rsa.go`
     1. copy values
     2. modify `decrypt-key.go`, `crypter/encrypt.go` and `server.go` with those values (there are comments that tell you where those things should go)
@@ -37,6 +37,9 @@ Try without compression.
 
 _I did, still doesn't work!_
 In case you're on linux you need to generate with a machine ID with `dbus-uuidgen` and put it in `/etc/machine-id`.
+
+## LEGAL NOTICE
+THIS SOFTWARE IS PROVIDED FOR EDUCATIONAL USE ONLY! IF YOU ENGAGE IN ANY ILLEGAL ACTIVITY THE AUTHOR DOES NOT TAKE ANY RESPONSIBILITY FOR IT. BY USING THIS SOFTWARE YOU AGREE WITH THESE TERMS.
 
 ## License
 **Go-crypt** is made with ♥  by target_ and is licensed under WTFPL - Do What the Fuck You Want to Public License, which is pretty clear on what you can and what you can't do:
