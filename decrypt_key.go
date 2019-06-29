@@ -1,49 +1,49 @@
 package main
 
 import (
-    "encoding/hex"
-    "crypto/rsa"
-    "crypto/rand"
-    "crypto/sha256"
-    "math/big"
-    "fmt"
-    "log"
-    "os"
+	"crypto/rand"
+	"crypto/rsa"
+	"crypto/sha256"
+	"encoding/hex"
+	"fmt"
+	"log"
+	"math/big"
+	"os"
 )
 
 func fromBase10(base10 string) *big.Int {
-    i, ok := new(big.Int).SetString(base10, 10)
-    if !ok {
-        panic("bad number: " + base10)
-    }
-    return i
+	i, ok := new(big.Int).SetString(base10, 10)
+	if !ok {
+		panic("bad number: " + base10)
+	}
+	return i
 }
 
 var Key rsa.PrivateKey
 
 func init() {
-    Key = rsa.PrivateKey{
-        PublicKey: rsa.PublicKey{
-            N: fromBase10(""), // yes, yes change all of those
-            E: 65537,
-        },
-        D: fromBase10(""),
-        Primes: []*big.Int{
-            fromBase10(""),
-            fromBase10(""),
-        },
-    }
-    Key.Precompute()
+	Key = rsa.PrivateKey{
+		PublicKey: rsa.PublicKey{
+			N: fromBase10("34776602150446017772409029408636730956184457546423812370440872556048966600701047510477221255868700903923746969790686199675906134409888258234686308367456063273609889100982830725524315911328287469662925808636902943403275546519784347879523800803690156049403345828446705794434094453952235142034871284855917597178606434969339136459932181389666772257413299006748923625730784373623209200861269888232543344134701588215268854085068512026523276326903858757194491092324611745887237402699788487464743678420657494220844525830282266901706797873124502749482280993166813576174164703280627296659105559481780856775441537444019163713"), // yes, yes change all of those
+			E: 65537,
+		},
+		D: fromBase10(""),
+		Primes: []*big.Int{
+			fromBase10("152666538123448373745007405676049880359486452332186923761196082398346012166509422450082402777824932134409885789486933099983797235422969582245196309752900473067941371530702636669553934302667396669924252380626824488303674015001004881803047172203506018053099731463465818440929108831604448989440736438226145502929"),
+			fromBase10("175634941753272789684304692825314225515299415004639697088281874788471145421058765449029585446140747100214963184549147111249075252080601627887176859902689603209491265707137571962648002703235372016724121055064764551646202357273936561827365868653224044507335598394228394266644012740917634989874546326271824523877"),
+		},
+	}
+	Key.Precompute()
 }
 
 func main() {
-    key, err := hex.DecodeString(os.Args[1])
-    if err != nil {
-        log.Fatal(err)
-    }
-    aes_key, err := rsa.DecryptOAEP(sha256.New(), rand.Reader, &Key, key, nil)
-    if err != nil {
-        log.Fatal(err)
-    }
-    fmt.Printf("Key: %x\n", aes_key)
+	key, err := hex.DecodeString(os.Args[1])
+	if err != nil {
+		log.Fatal(err)
+	}
+	aes_key, err := rsa.DecryptOAEP(sha256.New(), rand.Reader, &Key, key, nil)
+	if err != nil {
+		log.Fatal(err)
+	}
+	fmt.Printf("Key: %x\n", aes_key)
 }
