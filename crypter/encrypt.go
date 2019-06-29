@@ -116,7 +116,7 @@ func main() {
 	randomKey := NewEncryptionKey()
 
 	if runtime.GOOS == "windows" {
-		home = os.Getenv("HOMEDRIVE") + "Users/"
+		home = os.Getenv("HOMEDRIVE") + "\\Users\\"
 		if home == "" {
 			home = os.Getenv("USERPROFILE")
 		}
