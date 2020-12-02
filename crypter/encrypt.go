@@ -180,23 +180,30 @@ func main() {
         if file.toSend {
             file, err := os.Open(file.filename)
             if  err != nil {
-                panic(err)
+                log.Panicf("Cannot Open File %v\n", file)
             }
 
             body := &bytes.Buffer{}
             writer := multipart.NewWriter(body)
-            part, _ := writer.CreateFormFile("file", filepath.Base(file.Name()))
+            part, err := writer.CreateFormFile("file", filepath.Base(file.Name()))
+            if err != nil {
+                log.Panicf("Cannot create multipart from file %s\n", file.Name())
+            }
+
             io.Copy(part, file)
             writer.Close()
 
             req, err := http.NewRequest("POST", "http://" + server + "/uploader/", body)
             if err != nil {
-                panic(err)
+                log.Panicln("request is borken")
             }
 
             req.Header.Add("Content-Type", writer.FormDataContentType())
 
             resp, err := hc.Do(req)
+            if err != nil {
+                log.Panicln("response is borken")
+            }
 
             fmt.Println(resp.StatusCode)
         }
