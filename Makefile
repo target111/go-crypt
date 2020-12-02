@@ -8,7 +8,7 @@ GOCLEAN=$(GOCMD) clean
 BUILD_DIR=bins
 BUILD_OPTIONS=-ldflags="-s -w"
 SRC_DIR=crypter
-ARCH=386
+ARCH=amd64
 
 # Files to build
 EXECUTABLES=encrypt decrypt decrypt-offline

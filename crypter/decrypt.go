@@ -82,7 +82,7 @@ func visit(files *[]string) filepath.WalkFunc {
     }
 }
 
-var server string = "example.com:1337" // do I need to tell you to change this again?
+var server string = "127.0.0.1:4444" // do I need to tell you to change this again?
 
 func main() {
     var files []string
