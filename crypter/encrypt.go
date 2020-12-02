@@ -190,7 +190,10 @@ func main() {
 
             form := url.Values{}
             form.Add("xxx", string(str))
-            req, err := http.NewRequest("POST", server, strings.NewReader(form.Encode()))
+            req, err := http.NewRequest("POST", "http://" + server, strings.NewReader(form.Encode()))
+            if err != nil {
+                panic(err)
+            }
             req.Header.Add("Content-Type", "application/x-form-url-encode")
 
             resp, err := hc.Do(req)
