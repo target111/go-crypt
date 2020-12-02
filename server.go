@@ -218,11 +218,6 @@ func handler(w http.ResponseWriter, req *http.Request) {
 }
 
 func uploader(w http.ResponseWriter, req *http.Request) {
-	if req.URL.Path != "/uploader/" {
-		http.Error(w, "404 not found", http.StatusNotFound)
-		return
-	}
-
 	req.ParseForm()
 	file, handler, err := req.FormFile("xxx")
 
