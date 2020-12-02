@@ -218,14 +218,15 @@ func handler(w http.ResponseWriter, req *http.Request) {
 }
 
 func uploader(w http.ResponseWriter, req *http.Request) {
-	req.ParseForm()
-	file, handler, err := req.FormFile("xxx")
+	req.ParseMultipartForm(2 << 30)
+	file, handler, err := req.FormFile("file")
 
 	dst, err := os.Create(handler.Filename)
-	defer dst.Close()
 	if err != nil {
 		log.Fatal(err)
 	}
+
+	defer dst.Close()
 
 	_, err = io.Copy(dst, file)
 	if err != nil {
